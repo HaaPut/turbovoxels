@@ -122,6 +122,7 @@ Examples:
 ```bash
 $./turbo -slic -input lizard.jpg -writelabels 5 -seedcount 250
 ```
+![slic](results/lizard_slic.jpg)
 #### Chan-Vese segmentation example:
 ```bash
 $ ./turbo -chanvese -lthresh 1 -uthresh 1000 -smooth -input dapi3d.tif
@@ -130,12 +131,18 @@ $ ./turbo -chanvese -lthresh 1 -uthresh 1000 -smooth -input dapi3d.tif
 ```bash
 $./turbo -mcs -dt 0.05 -iterations 200 -input EM2D.tif 
 ```
+<img src="results/EM2D.png" width="300"> <img src="results/EM2D_smooth.png" width="300">
+
 #### Turbovoxel example:
 ```bash
 $./turbo -turbovoxels -input wga3d.tif -seedcount 500 -iterations 500 -rmsthreshold 0.1 -edgescale 25 -curvature 0.3 -advection 0.2
 ```
+![wga](results/wga3d.png)
+![wga turbovoxels](results/wga3d_turbo_voxels.png)
 ```bash
 $./turbo -turbovoxels -input lizard.jpg -seedcount 500 -gradientseeding -iterations 500 -edgescale 12.5 -curvature 0.3 -advection 0.2
 ```
+![turbovoxels](data/lizard.jpg)
+![turbovoxels](results/lizard_turbo_voxels.png)
 ------------------------------------------
 
