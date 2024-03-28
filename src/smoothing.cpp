@@ -33,6 +33,8 @@
 #include <itkMinMaxCurvatureFlowImageFilter.h>
 #include <itkBinaryMinMaxCurvatureFlowImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
+#include <itkMinimumMaximumImageCalculator.h>
+#include <itkClampImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <typeinfo>
 #include <vector>
@@ -97,8 +99,28 @@ int curvature_smoothing_impl(
 
     smoothingFilter->SetNumberOfIterations(numberOfIterations);
     smoothingFilter->SetTimeStep(timeStep);
-    smoothingFilter->Update();
 
+    using ClampFilterType = itk::ClampImageFilter<OutputImageType, OutputImageType>;
+    auto clampFilter = ClampFilterType::New();
+    clampFilter->SetInput(smoothingFilter->GetOutput());
+
+    if(parser->ArgumentExists("-clamp")){
+	logger->Debug("Switched output to clamp to input range\n");
+        using ImageCalculatorFilterType = itk::MinimumMaximumImageCalculator<InputImageType>;
+        auto imageCalculatorFilter = ImageCalculatorFilterType::New();
+        imageCalculatorFilter->SetImage(reader->GetOutput());
+	reader->Update();
+        imageCalculatorFilter->Compute();
+        OutputPixelType lowerBound = static_cast<OutputPixelType>(imageCalculatorFilter->GetMinimum());
+	parser->GetCommandLineArgument("-lthresh",lowerBound);
+	logger->Debug("Set lower clamp bound = " + std::to_string(lowerBound) + "\n");
+
+	OutputPixelType upperBound = static_cast<OutputPixelType>(imageCalculatorFilter->GetMaximum());
+	parser->GetCommandLineArgument("-uthresh",upperBound);
+	logger->Debug("Set uppder clamp bound = " + std::to_string(upperBound) + "\n");
+	clampFilter->SetBounds(lowerBound, upperBound);
+    }
+    
     bool rescale = parser->ArgumentExists("-rescale");
     std::string outputFileName;
     parser->GetCommandLineArgument("-output", outputFileName);
@@ -109,7 +131,7 @@ int curvature_smoothing_impl(
         typename RescaleFilterType::Pointer rescaler = RescaleFilterType::New();
         rescaler->SetOutputMinimum(0);
         rescaler->SetOutputMaximum(1);
-        rescaler->SetInput(smoothingFilter->GetOutput());
+        rescaler->SetInput(clampFilter->GetOutput());
 
         using WriterImageType = OutputImageType;
         using WriterType = itk::ImageFileWriter<WriterImageType>;
@@ -143,7 +165,7 @@ int curvature_smoothing_impl(
         using CastFilterType =
             itk::CastImageFilter<OutputImageType, WriterImageType>;
         typename CastFilterType::Pointer castFilter = CastFilterType::New();
-        castFilter->SetInput(smoothingFilter->GetOutput());
+        castFilter->SetInput(clampFilter->GetOutput());
         typename WriterType::Pointer writer = WriterType::New();
         writer->SetFileName(outputFileName);
         writer->SetInput(castFilter->GetOutput());

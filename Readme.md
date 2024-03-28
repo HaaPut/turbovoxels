@@ -55,7 +55,7 @@ Mean/min-max Curvature Smoothing:
 		                 if float is not supported by output file
 		 -radius R     : (unsigned) stencil radius for min-max flow (~noise size)
 		 -thresh th    : (double) threshold value of binary image
-
+                 -clamp        : clamp output value to range of input(default) or values supplied via -lthresh/-uthresh.
 
 Chan-Vese Segmentation:
 ----------------------
@@ -142,6 +142,7 @@ $./turbo -turbovoxels -input wga3d.tif -seedcount 500 -iterations 500 -rmsthresh
 ```bash
 $./turbo -turbovoxels -input lizard.jpg -seedcount 500 -gradientseeding -iterations 500 -edgescale 12.5 -curvature 0.3 -advection 0.2
 ```
+
 ![turbovoxels](data/lizard.jpg)
 ![turbovoxels](results/lizard_turbo_voxels.png)
 ------------------------------------------

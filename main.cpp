@@ -72,8 +72,10 @@ std::string helpstring() {
     ss << "\t\t                 if float is not supported by output file\n";
     ss << "\t\t -radius R     : (unsigned) stencil radius for min-max flow (~noise size)\n";
     ss << "\t\t -thresh th    : (double) threshold value of binary image\n";
-    // -------------------------------------------------------------------
+    ss << "\t\t -clamp        : clamp output value to range of input(default) or values supplied via -lthresh/-uthresh.";
+
     ss << "\n\n";
+    // -------------------------------------------------------------------
     ss << "Chan-Vese Segmentation:\n";
     ss << "----------------------\n";
     ss << "\t\t -iterations N : (default = 1) number of iterations to run\n";
